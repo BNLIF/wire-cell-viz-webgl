@@ -136,6 +136,7 @@ function SST(id, option) {
     this.y = [];
     this.z = [];
     this.q = [];
+    this.nq = [];
     this.chargeColor = new THREE.Color(0xFFFFFF);
     this.material = new THREE.PointCloudMaterial( {
         // color: guiController.rec_charge_color,
@@ -180,6 +181,7 @@ function SST(id, option) {
             sst.y = data.y;
             sst.z = data.z;
             sst.q = data.q;
+            sst.nq = data.nq;
 
             var particleCount = data.x.length;
             if (sst.option == "rec_charge_blob") {
@@ -495,26 +497,28 @@ $("#prevSlice").on("click", function(e){
     e.preventDefault();
     guiController.PrevSlice();
 });
-// $("#collapse").on("click", function(e){
-//     e.preventDefault();
-//     el = $(this);
-//     if (el.html() === "collapse all") {
-//         gui.__folders["Recon (Charge)"].close();
-//         gui.__folders["Recon (Simple)"].close();
-//         gui.__folders["Truth"].close();
-//         gui.__folders["Slice"].close();
-//         gui.__folders["Camera"].close();
-//         el.html("open all");
-//     }
-//     else {
-//         gui.__folders["Recon (Charge)"].open();
-//         gui.__folders["Recon (Simple)"].open();
-//         gui.__folders["Truth"].open();
-//         gui.__folders["Slice"].open();
-//         gui.__folders["Camera"].open();
-//         el.html("collapse all");
-//     }
-// });
+$("#collapse").on("click", function(e){
+    e.preventDefault();
+    el = $(this);
+    if (el.html() === "collapse all") {
+        gui.__folders["Recon (Charge)"].close();
+        gui.__folders["Recon (Charge De-blob)"].close();
+        gui.__folders["Recon (Simple)"].close();
+        gui.__folders["Truth"].close();
+        gui.__folders["Slice"].close();
+        gui.__folders["Camera"].close();
+        el.html("open all");
+    }
+    else {
+        gui.__folders["Recon (Charge)"].open();
+        gui.__folders["Recon (Charge De-blob)"].open();
+        gui.__folders["Recon (Simple)"].open();
+        gui.__folders["Truth"].open();
+        gui.__folders["Slice"].open();
+        gui.__folders["Camera"].open();
+        el.html("collapse all");
+    }
+});
 $("#hideStatus").on("click", function(e){
     e.preventDefault();
     el = $(this);
@@ -600,7 +604,7 @@ function initGUI() {
     // gui.add(guiController, 'Prev');
     // gui.add(guiController, 'Next');
 
-    gui.add(guiController, 'display', [ 'rec_charge_blob', 'rec_charge_cell', 'rec_simple', 'truth'])
+    gui.add(guiController, 'display', [ 'rec_charge', 'rec_simple', 'truth', 'rec_charge_deblob1'])
        .name("Display")
        .onChange(function(value) {
             if (value == 'rec_charge_blob') {
@@ -609,7 +613,7 @@ function initGUI() {
                 ev_rec_simple.material.opacity = 0;
                 ev_truth.material.opacity = 0;
             }
-            else if (value == 'rec_charge_cell') {
+            else if (value == 'rec_charge_deblob1') {
                 ev.material.opacity = 0;
                 ev_rec_charge_cell.material.opacity = 0.3;
                 ev_rec_simple.material.opacity = 0;
@@ -648,7 +652,7 @@ function initGUI() {
 
     });
 
-    var folder_recon = gui.addFolder("Recon (Blob Charge)");
+    var folder_recon = gui.addFolder("Recon (Charge)");
     folder_recon
         .add(guiController, "rec_charge_blob_size", 0, 6)
         .name("size")
@@ -664,21 +668,21 @@ function initGUI() {
         });
     folder_recon.open();
 
-    var folder_recon_cell = gui.addFolder("Recon (Cell Charge)");
-    folder_recon_cell
-        .add(guiController, "rec_charge_cell_size", 0, 6)
+    var folder_truth = gui.addFolder("Truth");
+    folder_truth
+        .add(guiController, "truth_size", 0, 6)
         .name("size")
         .step(1)
         .onChange(function(value) {
-            ev_rec_charge_cell.material.size = value;
+            ev_truth.material.size = value;
         });
-    folder_recon_cell
-        .add(guiController, "rec_charge_cell_opacity", 0, 1)
+    folder_truth
+        .add(guiController, "truth_opacity", 0, 1)
         .name("opacity")
         .onChange(function(value) {
-            ev_rec_charge_cell.material.opacity = value;
+            ev_truth.material.opacity = value;
         });
-    folder_recon_cell.open();
+    folder_truth.open();
 
     var folder_recon_simple = gui.addFolder("Recon (Simple)");
     folder_recon_simple
@@ -696,21 +700,21 @@ function initGUI() {
         });
     folder_recon_simple.open();
 
-    var folder_truth = gui.addFolder("Truth");
-    folder_truth
-        .add(guiController, "truth_size", 0, 6)
+    var folder_recon_cell = gui.addFolder("Recon (Charge De-blob)");
+    folder_recon_cell
+        .add(guiController, "rec_charge_cell_size", 0, 6)
         .name("size")
         .step(1)
         .onChange(function(value) {
-            ev_truth.material.size = value;
+            ev_rec_charge_cell.material.size = value;
         });
-    folder_truth
-        .add(guiController, "truth_opacity", 0, 1)
+    folder_recon_cell
+        .add(guiController, "rec_charge_cell_opacity", 0, 1)
         .name("opacity")
         .onChange(function(value) {
-            ev_truth.material.opacity = value;
+            ev_rec_charge_cell.material.opacity = value;
         });
-    folder_truth.open();
+    folder_recon_cell.open();
 
     var folder_slice = gui.addFolder("Slice");
     folder_slice
