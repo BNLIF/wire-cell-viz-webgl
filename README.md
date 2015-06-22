@@ -1,4 +1,4 @@
-# wire-cell-3dvis
+# wire-cell-viz-webgl
 
 ## Installation
 

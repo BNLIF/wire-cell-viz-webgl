@@ -48,18 +48,21 @@ var doRotate = false;
 // var positions;
 
 var guiController = {
-    display: "rec_charge",
+    display: "rec_charge_blob",
     showCharge: true,
     orthocamera: false,
 
-    rec_charge_opacity: default_opacity,
-    rec_charge_size: 2,
+    rec_charge_blob_opacity: default_opacity,
+    rec_charge_blob_size: 2,
 
-    truth_opacity: 0.,
-    truth_size: 2,
+    rec_charge_cell_opacity: 0.,
+    rec_charge_cell_size: 2,
 
     rec_simple_opacity: 0.,
     rec_simple_size: 2,
+
+    truth_opacity: 0.,
+    truth_size: 2,
 
     slice: {
         sliced_mode: false,
@@ -127,8 +130,8 @@ animate();
 // The SST class
 function SST(id, option) {
     this.id = id;
-    this.option = typeof option !== 'undefined' ?  option : 'rec_charge';
-    this.url = "data/" + id + "/" + id + "-rec_charge.json";
+    this.option = typeof option !== 'undefined' ?  option : 'rec_charge_blob';
+    this.url = "data/" + id + "/" + id + "-rec_charge_blob.json";
     this.x = [];
     this.y = [];
     this.z = [];
@@ -143,7 +146,7 @@ function SST(id, option) {
         // blending: THREE.NoBlending,
         // blending: THREE.MultiplyBlending,
         // blending: THREE.SubtractiveBlending,
-        opacity: guiController.rec_charge_opacity,
+        opacity: guiController.rec_charge_blob_opacity,
 
         transparent: true,
         sizeAttenuation: false
@@ -162,6 +165,11 @@ function SST(id, option) {
         this.chargeColor = new THREE.Color(0xFF00FF);
         this.material.opacity = guiController.rec_simple_opacity;
     }
+    else if (this.option === 'rec_charge_cell') {
+        this.url = "data/" + id + "/" + id + "-rec_charge_cell.json";
+        this.chargeColor = new THREE.Color(0xFF0000);
+        this.material.opacity = guiController.rec_charge_cell_opacity;
+    }
 
     this.loadData = function () {
         var sst = this;
@@ -174,7 +182,7 @@ function SST(id, option) {
             sst.q = data.q;
 
             var particleCount = data.x.length;
-            if (sst.option == "rec_charge") {
+            if (sst.option == "rec_charge_blob") {
                 eventXmax = getMaxOfArray(data.x);
                 eventXmin = getMinOfArray(data.x);
                 eventYmax = getMaxOfArray(data.y);
@@ -256,6 +264,9 @@ function init() {
 
     ev = new SST(id);
     ev.loadData();
+
+    ev_rec_charge_cell = new SST(id, "rec_charge_cell");
+    ev_rec_charge_cell.loadData();
 
     ev_truth = new SST(id, "truth");
     ev_truth.loadData();
@@ -414,6 +425,7 @@ function drawSlicedParticles(event, start, width) {
 
 function drawAllSlicedParticles(start, width) {
     drawSlicedParticles(ev, start, width);
+    drawSlicedParticles(ev_rec_charge_cell, start, width);
     drawSlicedParticles(ev_truth, start, width);
     drawSlicedParticles(ev_rec_simple, start, width);
 }
@@ -483,26 +495,26 @@ $("#prevSlice").on("click", function(e){
     e.preventDefault();
     guiController.PrevSlice();
 });
-$("#collapse").on("click", function(e){
-    e.preventDefault();
-    el = $(this);
-    if (el.html() === "collapse all") {
-        gui.__folders["Recon (Charge)"].close();
-        gui.__folders["Recon (Simple)"].close();
-        gui.__folders["Truth"].close();
-        gui.__folders["Slice"].close();
-        gui.__folders["Camera"].close();
-        el.html("open all");
-    }
-    else {
-        gui.__folders["Recon (Charge)"].open();
-        gui.__folders["Recon (Simple)"].open();
-        gui.__folders["Truth"].open();
-        gui.__folders["Slice"].open();
-        gui.__folders["Camera"].open();
-        el.html("collapse all");
-    }
-});
+// $("#collapse").on("click", function(e){
+//     e.preventDefault();
+//     el = $(this);
+//     if (el.html() === "collapse all") {
+//         gui.__folders["Recon (Charge)"].close();
+//         gui.__folders["Recon (Simple)"].close();
+//         gui.__folders["Truth"].close();
+//         gui.__folders["Slice"].close();
+//         gui.__folders["Camera"].close();
+//         el.html("open all");
+//     }
+//     else {
+//         gui.__folders["Recon (Charge)"].open();
+//         gui.__folders["Recon (Simple)"].open();
+//         gui.__folders["Truth"].open();
+//         gui.__folders["Slice"].open();
+//         gui.__folders["Camera"].open();
+//         el.html("collapse all");
+//     }
+// });
 $("#hideStatus").on("click", function(e){
     e.preventDefault();
     el = $(this);
@@ -588,32 +600,37 @@ function initGUI() {
     // gui.add(guiController, 'Prev');
     // gui.add(guiController, 'Next');
 
-    gui.add(guiController, 'display', [ 'rec_charge', 'rec_simple', 'truth'])
+    gui.add(guiController, 'display', [ 'rec_charge_blob', 'rec_charge_cell', 'rec_simple', 'truth'])
        .name("Display")
        .onChange(function(value) {
-            if (value == 'rec_charge') {
+            if (value == 'rec_charge_blob') {
                 ev.material.opacity = default_opacity;
+                ev_rec_charge_cell.opacity = 0;
                 ev_rec_simple.material.opacity = 0;
                 ev_truth.material.opacity = 0;
-                ev.material.needsUpdate = true;
-                ev_rec_simple.material.needsUpdate = true;
-                ev_truth.material.needsUpdate = true;
+            }
+            else if (value == 'rec_charge_cell') {
+                ev.material.opacity = 0;
+                ev_rec_charge_cell.material.opacity = 0.3;
+                ev_rec_simple.material.opacity = 0;
+                ev_truth.material.opacity = 0;
             }
             else if (value == 'rec_simple') {
                 ev.material.opacity = 0;
+                ev_rec_charge_cell.material.opacity = 0;
                 ev_rec_simple.material.opacity = default_opacity;
                 ev_truth.material.opacity = 0;
-                ev.material.needsUpdate = true;
-                ev_rec_simple.material.needsUpdate = true;
-                ev_truth.material.needsUpdate = true;
             }
             else if (value == 'truth') {
                 ev.material.opacity = 0;
+                ev_rec_charge_cell.material.opacity = 0;
                 ev_rec_simple.material.opacity = 0;
                 ev_truth.material.opacity = default_opacity;
-                ev.material.needsUpdate = true;
-                ev_rec_simple.material.needsUpdate = true;
-                ev_truth.material.needsUpdate = true;            };
+            };
+            ev.material.needsUpdate = true;
+            ev_rec_charge_cell.material.needsUpdate = true;
+            ev_rec_simple.material.needsUpdate = true;
+            ev_truth.material.needsUpdate = true;
        });
 
    gui.add(guiController, "showCharge")
@@ -631,21 +648,37 @@ function initGUI() {
 
     });
 
-    var folder_recon = gui.addFolder("Recon (Charge)");
+    var folder_recon = gui.addFolder("Recon (Blob Charge)");
     folder_recon
-        .add(guiController, "rec_charge_size", 0, 6)
+        .add(guiController, "rec_charge_blob_size", 0, 6)
         .name("size")
         .step(1)
         .onChange(function(value) {
             ev.material.size = value;
         });
     folder_recon
-        .add(guiController, "rec_charge_opacity", 0, 1)
+        .add(guiController, "rec_charge_blob_opacity", 0, 1)
         .name("opacity")
         .onChange(function(value) {
             ev.material.opacity = value;
         });
     folder_recon.open();
+
+    var folder_recon_cell = gui.addFolder("Recon (Cell Charge)");
+    folder_recon_cell
+        .add(guiController, "rec_charge_cell_size", 0, 6)
+        .name("size")
+        .step(1)
+        .onChange(function(value) {
+            ev_rec_charge_cell.material.size = value;
+        });
+    folder_recon_cell
+        .add(guiController, "rec_charge_cell_opacity", 0, 1)
+        .name("opacity")
+        .onChange(function(value) {
+            ev_rec_charge_cell.material.opacity = value;
+        });
+    folder_recon_cell.open();
 
     var folder_recon_simple = gui.addFolder("Recon (Simple)");
     folder_recon_simple
