@@ -339,29 +339,6 @@ function stop()
     slice.material.opacity = guiController.slice.opacity;
 }
 
-// function showCharge(event, drawColor) {
-//     var particleCount = event.x.length;
-//     for (var i=0; i<particleCount; i++) {
-//         if (drawColor) {
-//             var color = new THREE.Color();
-//             color.setHSL(getColorAtScalar(event.q[i], colorMax), 1, 0.5);
-//             event.geometry.colors[i] = color;
-//         }
-//         else {
-//             event.geometry.colors[i] = event.chargeColor;
-//         }
-//     }
-//     event.geometry.colorsNeedUpdate = true;
-//     // event.material.needsUpdate = true;
-// }
-
-// function showAllCharge(drawColor)
-// {
-//     showCharge(ev, drawColor);
-//     showCharge(ev_truth, drawColor);
-//     showCharge(ev_rec_simple, drawColor);
-// }
-
 function drawSlicedParticles(event, start, width) {
     var particleCount = event.x.length;
 
@@ -396,33 +373,6 @@ function drawSlicedParticles(event, start, width) {
     event.pointCloud = new THREE.PointCloud(event.geometry, event.material);
     group.add(event.pointCloud);
 
-
-    // for (var i=0; i<particleCount; i++) {
-    //     var x = event.x[i] - halfx;
-    //     var y = event.y[i];
-    //     var z = event.z[i] - halfz;
-
-    //     if (x  < start || x > start+width) {
-    //         event.geometry.colors[i] = new THREE.Color(0, 0, 0);
-    //     }
-    //     else {
-    //         if (guiController.showCharge) {
-    //             var color = new THREE.Color();
-    //             // color.setHex(rainbow.colourAt(data.q[i]/100));
-    //             color.setHSL(getColorAtScalar(event.q[i], colorMax),1, 0.5);
-    //             event.geometry.colors[i] = color;
-    //         }
-    //         else {
-    //             event.geometry.colors[i] = event.chargeColor;
-    //         }
-    //     }
-    // }
-
-
-
-    // event.geometry.colorsNeedUpdate = true;
-    // event.material.needsUpdate = true;
-    // console.log(event.geometry);
 }
 
 function drawAllSlicedParticles(start, width) {
@@ -431,30 +381,6 @@ function drawAllSlicedParticles(start, width) {
     drawSlicedParticles(ev_truth, start, width);
     drawSlicedParticles(ev_rec_simple, start, width);
 }
-
-// function restoreParticles(event) {
-//     var particleCount = event.x.length;
-
-//     // event.material.vertexColors = guiController.vertexColors;
-
-//     for (var i=0; i<particleCount; i++) {
-//         var color = new THREE.Color();
-//         // color.setHex(rainbow.colourAt(data.q[i]/100));
-//         color.setHSL(
-//             getColorAtScalar(event.q[i], colorMax),
-//             1, 0.5);
-//         event.geometry.colors[i] = color;
-//     }
-//     event.geometry.colorsNeedUpdate = true;
-//     event.material.needsUpdate = true;
-//     // console.log(event.geometry);
-// }
-
-// function restoreAllParticles() {
-//     restoreParticles(ev);
-//     restoreParticles(ev_truth);
-//     restoreParticles(ev_rec_simple);
-// }
 
 function updateStatusBar() {
     el_slice_x.html(slice.position.x.toFixed(1));
