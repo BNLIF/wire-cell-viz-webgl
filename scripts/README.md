@@ -6,6 +6,8 @@ To create the JSON files for web display, run
 root -b -q 'json_dump.C("example_data/nue.root", 5)'
 ```
 
+where the `5` is the event No. that one can specify.
+
 This will create a directory with the following structure
 ```
 └── 5
