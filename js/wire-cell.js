@@ -604,7 +604,7 @@ function initGUI() {
     // gui.add(guiController, 'Prev');
     // gui.add(guiController, 'Next');
 
-    gui.add(guiController, 'display', [ 'rec_charge', 'rec_simple', 'truth', 'rec_charge_deblob1'])
+    gui.add(guiController, 'display', [ 'rec_charge', 'truth', 'rec_simple', 'rec_charge_deblob'])
        .name("Display")
        .onChange(function(value) {
             if (value == 'rec_charge_blob') {
@@ -613,7 +613,7 @@ function initGUI() {
                 ev_rec_simple.material.opacity = 0;
                 ev_truth.material.opacity = 0;
             }
-            else if (value == 'rec_charge_deblob1') {
+            else if (value == 'rec_charge_deblob') {
                 ev.material.opacity = 0;
                 ev_rec_charge_cell.material.opacity = 0.3;
                 ev_rec_simple.material.opacity = 0;
