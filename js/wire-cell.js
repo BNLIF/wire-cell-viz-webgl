@@ -33,7 +33,8 @@ var el_slice_number = $("#slice_number");
 
 var group, container, scene, scene2, camera, renderer, controls;
 var animationId;
-var ev, ev_truth;
+var ev, ev_truth, ev_rec_simple, ev_rec_charge_cell;
+var list_of_sst = [];
 var slice;
 // var r = 800;
 var halfx = 128.;
@@ -123,14 +124,11 @@ var guiController = {
 router.init();
 guiController.eventNo = id;
 
-init();
-animate();
-
 
 // The SST class
-function SST(id, option) {
+function SST(id, name) {
     this.id = id;
-    this.option = typeof option !== 'undefined' ?  option : 'rec_charge_blob';
+    this.name = typeof name !== 'undefined' ?  name : 'rec_charge_blob';
     this.url = "data/" + id + "/" + id + "-rec_charge_blob.json";
     this.x = [];
     this.y = [];
@@ -156,68 +154,73 @@ function SST(id, option) {
     this.geometry = new THREE.Geometry();
     this.pointCloud = null;
 
-    if (this.option === 'truth') {
+    if (this.name === 'truth') {
         this.url = "data/" + id + "/" + id + "-truth.json";
         this.chargeColor = new THREE.Color(0xFFFF00);
         this.material.opacity = guiController.truth_opacity;
     }
-    else if (this.option === 'rec_simple') {
+    else if (this.name === 'rec_simple') {
         this.url = "data/" + id + "/" + id + "-rec_simple.json";
         this.chargeColor = new THREE.Color(0xFF00FF);
         this.material.opacity = guiController.rec_simple_opacity;
     }
-    else if (this.option === 'rec_charge_cell') {
+    else if (this.name === 'rec_charge_cell') {
         this.url = "data/" + id + "/" + id + "-rec_charge_cell.json";
         this.chargeColor = new THREE.Color(0xFF0000);
         this.material.opacity = guiController.rec_charge_cell_opacity;
     }
-
-    this.loadData = function () {
-        var sst = this;
-        var xhr = $.getJSON(sst.url, function(data) {
-
-            // console.log(data);
-            sst.x = data.x;
-            sst.y = data.y;
-            sst.z = data.z;
-            sst.q = data.q;
-            sst.nq = data.nq;
-
-            var particleCount = data.x.length;
-            if (sst.option == "rec_charge_blob") {
-                eventXmax = getMaxOfArray(data.x);
-                eventXmin = getMinOfArray(data.x);
-                eventYmax = getMaxOfArray(data.y);
-                eventYmin = getMinOfArray(data.y);
-                eventZmax = getMaxOfArray(data.z);
-                eventZmin = getMinOfArray(data.z);
-            }
-
-            for (var i=0; i<particleCount; i++) {
-                var v = new THREE.Vector3(
-                    data.x[i] - halfx,
-                    data.y[i],
-                    data.z[i] - halfz
-                );
-                sst.geometry.vertices.push(v);
-                var color = new THREE.Color();
-                color.setHSL(getColorAtScalar(data.q[i], colorMax), 1, 0.5);
-                sst.geometry.colors.push(color);
-            }
-
-
-            // create the particle system
-            sst.pointCloud = new THREE.PointCloud(sst.geometry, sst.material);
-            group.add( sst.pointCloud );
-
-        }).fail(function () {
-            console.log("load " + sst.url +  " failed");
-        });
-        return xhr;
-    };
 }
 
 
+SST.prototype.loadData = function () {
+    var sst = this;
+    var xhr = $.getJSON(sst.url, function(data) {
+
+        // console.log(data);
+        sst.x = data.x;
+        sst.y = data.y;
+        sst.z = data.z;
+        sst.q = data.q;
+        sst.nq = data.nq;
+
+        var particleCount = data.x.length;
+        if (sst.name == "rec_charge_blob") {
+            eventXmax = getMaxOfArray(data.x);
+            eventXmin = getMinOfArray(data.x);
+            eventYmax = getMaxOfArray(data.y);
+            eventYmin = getMinOfArray(data.y);
+            eventZmax = getMaxOfArray(data.z);
+            eventZmin = getMinOfArray(data.z);
+        }
+
+        for (var i=0; i<particleCount; i++) {
+            var v = new THREE.Vector3(
+                data.x[i] - halfx,
+                data.y[i],
+                data.z[i] - halfz
+            );
+            sst.geometry.vertices.push(v);
+            var color = new THREE.Color();
+            color.setHSL(getColorAtScalar(data.q[i], colorMax), 1, 0.5);
+            sst.geometry.colors.push(color);
+        }
+
+
+        // create the particle system
+        sst.pointCloud = new THREE.PointCloud(sst.geometry, sst.material);
+        group.add( sst.pointCloud );
+
+    }).fail(function () {
+        console.log("load " + sst.url +  " failed");
+    });
+    return xhr;
+};
+
+function addSST(name) {
+    var s = new SST(id, name);
+    list_of_sst[name] = s;
+    s.loadData();
+}
 
 function init() {
     initGUI();
@@ -263,6 +266,12 @@ function init() {
         }));
     slice.position.x = guiController.slice.position;
     scene2.add( slice );  // slice has its own scene
+
+    // addSST("rec_charge_blob");
+    // addSST("truth");
+    // addSST("rec_simple");
+    // addSST("rec_charge_cell");
+    // console.log(list_of_sst);
 
     ev = new SST(id);
     ev.loadData();
@@ -705,3 +714,6 @@ function initGUI() {
     folder_camera.open();
 
 }
+
+init();
+animate();
