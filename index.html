@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>wire-cell demo</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                color: #cccccc;
+                font-family:Monospace;
+                font-size:12px;
+                text-align:center;
+
+                background-color: #000000;
+                /*background-color: white;*/
+                margin: 0px;
+                overflow: hidden;
+            }
+
+            #info {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                /*width: 100%;*/
+                padding: 5px;
+            }
+            #statusbar {
+                position: absolute;
+                bottom: 0px;
+                left: 0px;
+                padding: 5px;
+            }
+            #container {
+                width: 85%;
+            }
+            a {color: #82beb7;}
+            .function {font-weight: bold;}
+            .key {color: orange; font-weight: bold;}
+
+        </style>
+    </head>
+    <body>
+        <div id="container"></div>
+        <div id="info"> |
+            <a href="#" id="play">play</a> |
+            <a href="#" id="prevEvent">prev event</a> <span class="key">p</span> |
+            <a href="#" id="nextEvent">next event</a> <span class="key">n</span> |
+            <a href="#" id="prevSlice">prev slice</a> <span class="key">j</span> |
+            <a href="#" id="nextSlice">next slice</a> <span class="key">k</span> |
+            <!-- <a href="#" id="hideStatus">hide status bar</a> | -->
+            <a href="#" id="collapse">collapse all</a>
+        </div>
+    <div id="statusbar">
+        slice #: <span id="slice_number">0</span> |
+        slice x: <span id="slice_x">0</span>
+    </div>
+
+        <script src="js/libs/jquery-2.1.4.min.js"></script>
+        <script src="js/libs/director.min.js"></script>
+        <script src="js/libs/dat.gui.min.js"></script>
+        <script src="js/libs/three.min.js"></script>
+        <script src="js/libs/OrbitControls.js"></script>
+        <script src="js/libs/screenfull.min.js"></script>
+
+        <script src="js/wire-cell.js"></script>
+
+    </body>
+</html>
